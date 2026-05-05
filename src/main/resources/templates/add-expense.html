@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Expense</title>
+</head>
+<body>
+
+<h2>Add Expense</h2>
+
+<form action="/save-expense" method="post">
+    <label>Title:</label>
+    <input type="text" name="title"><br><br>
+
+    <label>Amount:</label>
+    <input type="number" name="amount"><br><br>
+
+    <label>Category:</label>
+    <input type="text" name="category"><br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+</body>
+</html>
