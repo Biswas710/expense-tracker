@@ -7,19 +7,28 @@
 
 <h2>Add Expense</h2>
 
-<form th:action="@{/save-expense}" th:object="${expense}" method="post">
+<form th:action="@{/update-expense}"
+      th:object="${expense}"
+      method="post">
+
+    <!-- Hidden ID field -->
+    <input type="hidden" th:field="*{id}">
 
     <label>Title:</label>
-    <input type="text" th:field="*{title}"><br><br>
+    <input type="text" th:field="*{title}">
+    <br><br>
 
     <label>Amount:</label>
-    <input type="number" th:field="*{amount}"><br><br>
+    <input type="number" th:field="*{amount}">
+    <br><br>
 
     <label>Category:</label>
-    <input type="text" th:field="*{category}"><br><br>
+    <input type="text" th:field="*{category}">
+    <br><br>
 
     <button type="submit">Save</button>
 
 </form>
+
 </body>
 </html>

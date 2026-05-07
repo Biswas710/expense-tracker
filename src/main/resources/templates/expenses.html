@@ -8,21 +8,48 @@
 <h2>Expense List</h2>
 
 <table border="1">
+
     <tr>
+        <th>ID</th>
         <th>Title</th>
         <th>Amount</th>
         <th>Category</th>
+        <th>Actions</th>
     </tr>
 
+    <!-- Loop through expenses -->
     <tr th:each="expense : ${expenses}">
+
+        <td th:text="${expense.id}"></td>
+
         <td th:text="${expense.title}"></td>
+
         <td th:text="${expense.amount}"></td>
+
         <td th:text="${expense.category}"></td>
+
+        <td>
+
+            <!-- Edit Button -->
+            <a th:href="@{/edit/{id}(id=${expense.id})}">
+                Edit
+            </a>
+
+            |
+
+            <!-- Delete Button -->
+            <a th:href="@{/delete/{id}(id=${expense.id})}">
+                Delete
+            </a>
+
+        </td>
+
     </tr>
 
 </table>
 
 <br>
+
 <a href="/add-expense">Add New Expense</a>
 
 </body>
