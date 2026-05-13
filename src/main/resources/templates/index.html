@@ -1,11 +1,401 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Expense Tracker</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, sans-serif;
+            background:#f4f6f9;
+            overflow-x:hidden;
+        }
+
+        /* NAVBAR */
+
+        .navbar-custom{
+            background:white;
+            padding:15px 50px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .brand-logo{
+            font-size:28px;
+            font-weight:bold;
+            color:#212529;
+        }
+
+        .nav-btn{
+            border-radius:10px;
+            padding:10px 20px;
+            font-weight:600;
+        }
+
+        /* HERO SECTION */
+
+        .hero{
+            min-height:90vh;
+            display:flex;
+            align-items:center;
+            padding:60px;
+            background:linear-gradient(to right,#f8f9fa,#e9ecef);
+        }
+
+        .hero-title{
+            font-size:60px;
+            font-weight:800;
+            color:#212529;
+            line-height:1.2;
+        }
+
+        .hero-text{
+            font-size:20px;
+            color:#6c757d;
+            margin-top:20px;
+            margin-bottom:35px;
+        }
+
+        .hero-btn{
+            padding:15px 30px;
+            border-radius:12px;
+            font-size:18px;
+            font-weight:600;
+            transition:0.3s;
+        }
+
+        .hero-btn:hover{
+            transform:translateY(-3px);
+        }
+
+        .hero-image{
+            width:100%;
+            animation:float 3s ease-in-out infinite;
+        }
+
+        @keyframes float{
+            0%{
+                transform:translateY(0px);
+            }
+            50%{
+                transform:translateY(-15px);
+            }
+            100%{
+                transform:translateY(0px);
+            }
+        }
+
+        /* FEATURES */
+
+        .features{
+            padding:80px 40px;
+        }
+
+        .section-title{
+            text-align:center;
+            font-size:42px;
+            font-weight:bold;
+            margin-bottom:60px;
+            color:#212529;
+        }
+
+        .feature-card{
+            background:white;
+            padding:35px;
+            border-radius:20px;
+            box-shadow:0 0 15px rgba(0,0,0,0.08);
+            transition:0.3s;
+            height:100%;
+        }
+
+        .feature-card:hover{
+            transform:translateY(-8px);
+        }
+
+        .feature-icon{
+            font-size:55px;
+            color:#212529;
+            margin-bottom:20px;
+        }
+
+        .feature-title{
+            font-size:24px;
+            font-weight:700;
+            margin-bottom:15px;
+        }
+
+        .feature-text{
+            color:#6c757d;
+            font-size:16px;
+        }
+
+        /* CTA */
+
+        .cta{
+            background:#212529;
+            color:white;
+            text-align:center;
+            padding:80px 30px;
+        }
+
+        .cta h2{
+            font-size:45px;
+            font-weight:bold;
+            margin-bottom:20px;
+        }
+
+        .cta p{
+            font-size:18px;
+            margin-bottom:35px;
+            color:#ced4da;
+        }
+
+        /* FOOTER */
+
+        .footer{
+            background:#111;
+            color:#adb5bd;
+            text-align:center;
+            padding:20px;
+        }
+
+        @media(max-width:768px){
+
+            .hero{
+                text-align:center;
+                padding:40px 20px;
+            }
+
+            .hero-title{
+                font-size:40px;
+            }
+
+            .hero-text{
+                font-size:18px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 <body>
 
-<h1>Welcome to Expense Tracker 💰</h1>
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand brand-logo" href="#">
+            <i class="bi bi-wallet2"></i>
+           Finance Manager
+        </a>
+
+        <div class="d-flex gap-3">
+
+            <a href="/login"
+               class="btn btn-outline-dark nav-btn">
+                Login
+            </a>
+
+            <a href="/register"
+               class="btn btn-dark nav-btn">
+                Register
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- HERO SECTION -->
+
+<section class="hero">
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6">
+
+                <h1 class="hero-title">
+                    Manage Your Expenses Smartly 💰
+                </h1>
+
+                <p class="hero-text">
+                    Track daily spending, analyze monthly expenses,
+                    and manage your personal finance with a modern,
+                    secure, and easy-to-use expense tracker.
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap">
+
+                    <a href="/register"
+                       class="btn btn-dark hero-btn">
+
+                        <i class="bi bi-person-plus"></i>
+                        Get Started
+
+                    </a>
+
+                    <a href="/login"
+                       class="btn btn-outline-dark hero-btn">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Login
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6 text-center">
+
+                <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png"
+                     class="hero-image"
+                     alt="Expense Tracker">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FEATURES -->
+
+<section class="features">
+
+    <div class="container">
+
+        <h2 class="section-title">
+            Why Choose Expense Tracker?
+        </h2>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="feature-card text-center">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+
+                    <h3 class="feature-title">
+                        Expense Analytics
+                    </h3>
+
+                    <p class="feature-text">
+                        Visualize your expenses and understand
+                        where your money goes every month.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-card text-center">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+
+                    <h3 class="feature-title">
+                        Secure Authentication
+                    </h3>
+
+                    <p class="feature-text">
+                        Your financial data is protected using
+                        Spring Security authentication.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-card text-center">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+
+                    <h3 class="feature-title">
+                        Responsive Design
+                    </h3>
+
+                    <p class="feature-text">
+                        Fully responsive interface that works
+                        smoothly on desktop and mobile devices.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CTA -->
+
+<section class="cta">
+
+    <h2>
+        Start Tracking Your Expenses Today 🚀
+    </h2>
+
+    <p>
+        Create your account and take control of your finances.
+    </p>
+
+    <a href="/register"
+       class="btn btn-light btn-lg px-5 py-3 rounded-4 fw-bold">
+
+        Create Free Account
+
+    </a>
+
+</section>
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <p>
+        © 2026 Expense Tracker | Built with Spring Boot & Thymeleaf
+    </p>
+
+</footer>
 
 </body>
 </html>

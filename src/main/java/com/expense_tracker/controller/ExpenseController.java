@@ -19,6 +19,7 @@ public class ExpenseController {
 
     private final UserRepository userRepo;
 
+
     // Constructor Injection
     public ExpenseController(ExpenseRepository repo,
                              UserRepository userRepo) {
@@ -54,24 +55,37 @@ public class ExpenseController {
         return "redirect:/expenses";
     }
 
-    @GetMapping("/expenses")
-    public String showExpenses(Model model,
-                               Principal principal) {
 
-        // Get logged-in username
+
+    @GetMapping("/expenses")
+    public String showExpenses(Model model, Principal principal) {
+
         String username = principal.getName();
 
-        // Find user
         User user = userRepo.findByUsername(username);
 
-        // Fetch only that user's expenses
+        // Get expenses of logged-in user
         List<Expense> expenses = repo.findByUser(user);
 
+        // Calculate total expense
+        double totalExpense = expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        // Calculate current month expense
+        double monthlyExpense = expenses.stream()
+                .filter(expense -> expense.getDate() != null &&
+                        expense.getDate().getMonthValue() ==
+                                java.time.LocalDate.now().getMonthValue())
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
         model.addAttribute("expenses", expenses);
+        model.addAttribute("totalExpense", totalExpense);
+        model.addAttribute("monthlyExpense", monthlyExpense);
 
         return "expenses";
     }
-
     @GetMapping("/delete/{id}")
     public String deleteExpense(@PathVariable Long id) {
 

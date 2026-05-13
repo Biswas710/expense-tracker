@@ -2,6 +2,8 @@ package com.expense_tracker.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class Expense {
 
@@ -9,6 +11,15 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    private LocalDate date;
     private String title;
 
     private double amount;

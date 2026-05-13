@@ -19,6 +19,11 @@ public class AuthController {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+    @GetMapping("/")
+    public String home() {
+
+        return "index";
+    }
 
     @GetMapping("/register")
     public String registerPage(Model model) {
