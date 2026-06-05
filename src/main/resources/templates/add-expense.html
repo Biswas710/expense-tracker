@@ -126,7 +126,7 @@
         Add Expense
     </a>
 
-    <a href="#">
+    <a href="/analytics">
         <i class="bi bi-bar-chart"></i>
         Analytics
     </a>
@@ -201,6 +201,20 @@
                        required>
 
             </div>
+            <!-- DATE -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-bold">
+                    Expense Date
+                </label>
+
+                <input type="date"
+                       th:field="*{date}"
+                       class="form-control"
+                       required>
+
+            </div>
 
             <!-- CATEGORY -->
 
@@ -251,18 +265,7 @@
             </div>
             <!-- DATE -->
 
-            <div class="mb-4">
 
-                <label class="form-label fw-bold">
-                    Expense Date
-                </label>
-
-                <input type="date"
-                       th:field="*{date}"
-                       class="form-control"
-                       required>
-
-            </div>
 
             <!-- BUTTON -->
 

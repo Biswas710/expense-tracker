@@ -11,13 +11,6 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
 
     private LocalDate date;
     private String title;
@@ -34,16 +27,25 @@ public class Expense {
     }
 
     public Expense(Long id,
+                   LocalDate date,
                    String title,
                    double amount,
                    String category,
                    User user) {
 
         this.id = id;
+        this.date=date;
         this.title = title;
         this.amount = amount;
         this.category = category;
         this.user = user;
+    }
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public Long getId() {

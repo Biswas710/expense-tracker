@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Analytics</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body style="background:#f4f6f9;">
+
+<div class="container mt-5">
+
+    <div class="row">
+
+        <!-- BAR CHART -->
+
+        <div class="col-md-7">
+
+            <div class="card shadow p-4">
+
+                <h2 class="mb-4">
+                    Monthly Expense Analytics
+                </h2>
+
+                <canvas id="expenseChart"
+                        height="100"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- PIE CHART -->
+
+        <div class="col-md-5">
+
+            <div class="card shadow p-4">
+
+                <h2 class="mb-4">
+                    Category Analytics
+                </h2>
+
+                <canvas id="pieChart"
+                        height="220"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+
+    // BAR CHART
+
+    let labels =
+        /*[[${monthlyData.keySet()}]]*/ [];
+
+    let values =
+        /*[[${monthlyData.values()}]]*/ [];
+
+    const ctx =
+        document.getElementById('expenseChart');
+
+    new Chart(ctx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: labels,
+
+            datasets: [{
+
+                label: 'Expenses',
+
+                data: values
+
+            }]
+        }
+    });
+
+
+    // PIE CHART
+
+    let pieLabels =
+        /*[[${categoryData.keySet()}]]*/ [];
+
+    let pieValues =
+        /*[[${categoryData.values()}]]*/ [];
+
+    const pieCtx =
+        document.getElementById('pieChart');
+
+    new Chart(pieCtx, {
+
+        type: 'pie',
+
+        data: {
+
+            labels: pieLabels,
+
+            datasets: [{
+
+                data: pieValues
+
+            }]
+        }
+    });
+
+</script>
+
+</body>
+
+</html>

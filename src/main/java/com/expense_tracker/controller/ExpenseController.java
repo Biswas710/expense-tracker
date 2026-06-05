@@ -8,9 +8,9 @@ import com.expense_tracker.repository.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 import java.security.Principal;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class ExpenseController {
@@ -26,6 +26,115 @@ public class ExpenseController {
 
         this.repo = repo;
         this.userRepo = userRepo;
+    }
+    @GetMapping("/analytics")
+    public String analytics(Model model,
+                            Principal principal) {
+
+        String username = principal.getName();
+
+        User user = userRepo.findByUsername(username);
+
+        List<Expense> expenses = repo.findByUser(user);
+
+        // Month-wise totals
+        Map<String, Double> monthlyData = new LinkedHashMap<>();
+
+        for (Expense expense : expenses) {
+
+            if (expense.getDate() != null) {
+
+                String month =
+                        expense.getDate().getMonth().toString();
+
+                monthlyData.put(
+                        month,
+                        monthlyData.getOrDefault(month, 0.0)
+                                + expense.getAmount()
+                );
+            }
+        }
+
+        model.addAttribute("monthlyData", monthlyData);
+        Map<String, Double> categoryData = new LinkedHashMap<>();
+
+        for (Expense expense : expenses) {
+
+            if (expense.getDate() != null &&
+
+                    expense.getDate().getMonthValue() ==
+                            LocalDate.now().getMonthValue() &&
+
+                    expense.getDate().getYear() ==
+                            LocalDate.now().getYear()) {
+
+                String category = expense.getCategory();
+
+                categoryData.put(
+
+                        category,
+
+                        categoryData.getOrDefault(category, 0.0)
+
+                                + expense.getAmount()
+                );
+
+            }
+        }
+        model.addAttribute("categoryData", categoryData);
+
+        return "analytics";
+    }
+    @GetMapping("/profile")
+    public String profile(Model model,
+                          Principal principal) {
+
+        String username = principal.getName();
+
+        User user =
+                userRepo.findByUsername(username);
+
+        List<Expense> expenses =
+                repo.findByUser(user);
+
+        double totalExpense =
+                expenses.stream()
+                        .mapToDouble(Expense::getAmount)
+                        .sum();
+
+        String topCategory = expenses.stream()
+
+                .collect(java.util.stream.Collectors.groupingBy(
+
+                        Expense::getCategory,
+
+                        java.util.stream.Collectors.summingDouble(
+                                Expense::getAmount
+                        )
+                ))
+
+                .entrySet()
+
+                .stream()
+
+                .max(java.util.Map.Entry.comparingByValue())
+
+                .map(java.util.Map.Entry::getKey)
+
+                .orElse("No Data");
+
+        model.addAttribute("user", user);
+
+        model.addAttribute("totalExpense",
+                totalExpense);
+
+        model.addAttribute("totalTransactions",
+                expenses.size());
+
+        model.addAttribute("topCategory",
+                topCategory);
+
+        return "profile";
     }
 
     @GetMapping("/add-expense")
