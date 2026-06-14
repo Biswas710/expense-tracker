@@ -29,7 +29,9 @@ public class ExpenseController {
     }
     @GetMapping("/analytics")
     public String analytics(Model model,
-                            Principal principal) {
+                            Principal principal,
+                            @RequestParam(value = "month", required = false) Integer month,
+                            @RequestParam(value = "year", required = false) Integer year) {
 
         String username = principal.getName();
 
@@ -37,51 +39,96 @@ public class ExpenseController {
 
         List<Expense> expenses = repo.findByUser(user);
 
-        // Month-wise totals
-        Map<String, Double> monthlyData = new LinkedHashMap<>();
+        LocalDate today = LocalDate.now();
 
-        for (Expense expense : expenses) {
+        if(month == null) {
+            month = today.getMonthValue();
+        }
 
-            if (expense.getDate() != null) {
+        if(year == null) {
+            year = today.getYear();
+        }
 
-                String month =
-                        expense.getDate().getMonth().toString();
+        // ==========================
+        // BAR CHART (Whole Year)
+        // ==========================
+
+        Map<String, Double> monthlyData =
+                new LinkedHashMap<>();
+
+        for(Expense expense : expenses) {
+
+            if(expense.getDate() != null &&
+                    expense.getDate().getYear() == year) {
+
+                String monthName =
+                        expense.getDate()
+                                .getMonth()
+                                .toString();
 
                 monthlyData.put(
-                        month,
-                        monthlyData.getOrDefault(month, 0.0)
-                                + expense.getAmount()
+
+                        monthName,
+
+                        monthlyData.getOrDefault(
+                                monthName,
+                                0.0
+                        ) + expense.getAmount()
                 );
             }
         }
 
-        model.addAttribute("monthlyData", monthlyData);
-        Map<String, Double> categoryData = new LinkedHashMap<>();
+        model.addAttribute(
+                "monthlyData",
+                monthlyData
+        );
 
-        for (Expense expense : expenses) {
+        // ==========================
+        // PIE CHART (Selected Month)
+        // ==========================
 
-            if (expense.getDate() != null &&
+        Map<String, Double> categoryData =
+                new LinkedHashMap<>();
 
-                    expense.getDate().getMonthValue() ==
-                            LocalDate.now().getMonthValue() &&
+        for(Expense expense : expenses) {
 
-                    expense.getDate().getYear() ==
-                            LocalDate.now().getYear()) {
+            if(expense.getDate() != null &&
 
-                String category = expense.getCategory();
+                    expense.getDate()
+                            .getMonthValue() == month &&
+
+                    expense.getDate()
+                            .getYear() == year) {
+
+                String category =
+                        expense.getCategory();
 
                 categoryData.put(
 
                         category,
 
-                        categoryData.getOrDefault(category, 0.0)
-
-                                + expense.getAmount()
+                        categoryData.getOrDefault(
+                                category,
+                                0.0
+                        ) + expense.getAmount()
                 );
-
             }
         }
-        model.addAttribute("categoryData", categoryData);
+
+        model.addAttribute(
+                "categoryData",
+                categoryData
+        );
+
+        model.addAttribute(
+                "selectedMonth",
+                month
+        );
+
+        model.addAttribute(
+                "selectedYear",
+                year
+        );
 
         return "analytics";
     }

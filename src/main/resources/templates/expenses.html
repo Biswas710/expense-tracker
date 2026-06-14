@@ -109,10 +109,13 @@
         Profile
     </a>
 
-    <a href="/logout">
-        <i class="bi bi-box-arrow-right"></i>
-        Logout
-    </a>
+    <form th:action="@{/logout}" method="post" style="padding:15px 20px;">
+        <button type="submit"
+                style="background:none;border:none;color:white;">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </button>
+    </form>
 
 </div>
 
