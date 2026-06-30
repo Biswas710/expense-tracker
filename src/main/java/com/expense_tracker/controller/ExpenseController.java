@@ -8,12 +8,16 @@ import com.expense_tracker.repository.UserRepository;
 import com.expense_tracker.repository.BudgetRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.security.Principal;
 import java.util.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Controller
 public class ExpenseController {
@@ -262,28 +266,49 @@ public class ExpenseController {
 
 
     @GetMapping("/expenses")
-    public String showExpenses(Model model, Principal principal) {
+    public String showExpenses(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "5") int size,
+                               Model model,
+                               Principal principal) {
 
         String username = principal.getName();
 
         User user = userRepo.findByUsername(username);
 
-        List<Expense> expenses = repo.findByUser(user);
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("date").descending()
+        );
 
-        double totalExpense = expenses.stream()
-                .mapToDouble(Expense::getAmount)
-                .sum();
+        Page<Expense> expensePage = repo.findByUser(user, pageable);
+
+        List<Expense> expenses = expensePage.getContent();
+
+        // Used only for dashboard calculations
+        List<Expense> allExpenses = repo.findByUser(user);
 
         LocalDate today = LocalDate.now();
 
-        double monthlyExpense = expenses.stream()
-                .filter(expense -> expense.getDate() != null
-                        && expense.getDate().getMonthValue() == today.getMonthValue()
-                        && expense.getDate().getYear() == today.getYear())
+        double totalExpense = allExpenses.stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
 
-        // Fetch current month's budget
+        double monthlyExpense = allExpenses.stream()
+                .filter(expense ->
+                        expense.getDate() != null &&
+                                expense.getDate().getMonthValue() == today.getMonthValue() &&
+                                expense.getDate().getYear() == today.getYear())
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        long monthlyTransactions = allExpenses.stream()
+                .filter(expense ->
+                        expense.getDate() != null &&
+                                expense.getDate().getMonthValue() == today.getMonthValue() &&
+                                expense.getDate().getYear() == today.getYear())
+                .count();
+
         Budget budget = budgetRepo.findByUserAndMonthAndYear(
                 user,
                 today.getMonthValue(),
@@ -298,7 +323,6 @@ public class ExpenseController {
         if (budget != null) {
 
             monthlyBudget = budget.getMonthlyBudget();
-
             remainingBudget = monthlyBudget - monthlyExpense;
 
             if (monthlyBudget > 0) {
@@ -306,27 +330,28 @@ public class ExpenseController {
             }
 
             if (budgetUsed >= 100) {
-
                 warning = "🚨 Budget Exceeded!";
-
             } else if (budgetUsed >= 80) {
-
                 warning = "⚠️ You have used over 80% of your budget.";
-
             } else {
-
                 warning = "✅ Budget is under control.";
             }
         }
 
         model.addAttribute("expenses", expenses);
+
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("monthlyExpense", monthlyExpense);
+        model.addAttribute("monthlyTransactions", monthlyTransactions);
 
         model.addAttribute("monthlyBudget", monthlyBudget);
         model.addAttribute("remainingBudget", remainingBudget);
         model.addAttribute("budgetUsed", budgetUsed);
         model.addAttribute("warning", warning);
+
+        // Pagination
+        model.addAttribute("currentPage", expensePage.getNumber());
+        model.addAttribute("totalPages", expensePage.getTotalPages());
 
         return "expenses";
     }
