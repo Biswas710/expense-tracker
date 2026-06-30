@@ -104,6 +104,10 @@
         <i class="bi bi-bar-chart"></i>
         Analytics
     </a>
+    <a href="/budget">
+        <i class="bi bi-piggy-bank"></i>
+        Budget
+    </a>
     <a href="/profile">
         <i class="bi bi-person-circle"></i>
         Profile
@@ -141,6 +145,8 @@
 
     <div class="row g-4 mb-4">
 
+        <!-- Total Expense -->
+
         <div class="col-md-4">
 
             <div class="card dashboard-card shadow-sm p-4">
@@ -155,6 +161,8 @@
 
         </div>
 
+        <!-- Monthly Expense -->
+
         <div class="col-md-4">
 
             <div class="card dashboard-card shadow-sm p-4">
@@ -168,6 +176,8 @@
             </div>
 
         </div>
+
+        <!-- Transactions -->
 
         <div class="col-md-4">
 
@@ -185,6 +195,122 @@
 
     </div>
 
+    <!-- ====================== -->
+    <!-- BUDGET CARDS -->
+    <!-- ====================== -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm p-4">
+
+                <h5>💰 Monthly Budget</h5>
+
+                <h2 class="text-info">
+                    ₹<span th:text="${monthlyBudget}"></span>
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm p-4">
+
+                <h5>🟢 Remaining Budget</h5>
+
+                <h2 class="text-success">
+                    ₹<span th:text="${remainingBudget}"></span>
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm p-4">
+
+                <h5>📊 Budget Used</h5>
+
+                <h2 class="text-warning">
+
+                    <span th:text="${#numbers.formatDecimal(budgetUsed,1,1)}"></span>%
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====================== -->
+    <!-- PROGRESS BAR -->
+    <!-- ====================== -->
+
+    <div class="card shadow-sm p-4 mb-4">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h5>Monthly Budget Progress</h5>
+
+            <strong>
+
+                ₹<span th:text="${monthlyExpense}"></span>
+
+                /
+
+                ₹<span th:text="${monthlyBudget}"></span>
+
+            </strong>
+
+        </div>
+
+        <div class="progress mt-3"
+             style="height:30px;">
+
+            <div class="progress-bar"
+
+                 role="progressbar"
+
+                 th:classappend="${budgetUsed>=100} ?
+             ' bg-danger' :
+             (${budgetUsed>=80} ?
+             ' bg-warning' :
+             ' bg-success')"
+
+                 th:style="'width:' + ${budgetUsed} + '%'"
+
+                 th:text="${#numbers.formatDecimal(budgetUsed,1,1)} + '%'">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====================== -->
+    <!-- WARNING -->
+    <!-- ====================== -->
+
+    <div class="alert"
+
+         th:classappend="${budgetUsed>=100} ?
+     ' alert-danger' :
+     (${budgetUsed>=80} ?
+     ' alert-warning' :
+     ' alert-success')">
+
+        <strong th:text="${warning}"></strong>
+
+    </div>
+
+    <!-- ====================== -->
+    <!-- EXPENSE TABLE -->
+    <!-- ====================== -->
     <!-- EXPENSE TABLE -->
 
     <div class="table-container">

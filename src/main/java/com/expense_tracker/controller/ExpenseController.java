@@ -1,10 +1,13 @@
 package com.expense_tracker.controller;
 
+import com.expense_tracker.model.Budget;
 import com.expense_tracker.model.Expense;
 import com.expense_tracker.model.User;
 import com.expense_tracker.repository.ExpenseRepository;
 import com.expense_tracker.repository.UserRepository;
+import com.expense_tracker.repository.BudgetRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +22,15 @@ public class ExpenseController {
 
     private final UserRepository userRepo;
 
+    private final BudgetRepository budgetRepo;
 
     // Constructor Injection
     public ExpenseController(ExpenseRepository repo,
-                             UserRepository userRepo) {
+                             UserRepository userRepo, BudgetRepository budgetRepo) {
 
         this.repo = repo;
         this.userRepo = userRepo;
+        this.budgetRepo = budgetRepo;
     }
     @GetMapping("/analytics")
     public String analytics(Model model,
@@ -183,7 +188,50 @@ public class ExpenseController {
 
         return "profile";
     }
+    @GetMapping("/budget")
+    public String budgetPage() {
 
+        return "budget";
+    }
+    @PostMapping("/save-budget")
+    public String saveBudget(@ModelAttribute Budget budget,
+                             Principal principal) {
+
+        String username = principal.getName();
+
+        User user = userRepo.findByUsername(username);
+
+        LocalDate today = LocalDate.now();
+
+        Budget existingBudget =
+                budgetRepo.findByUserAndMonthAndYear(
+                        user,
+                        today.getMonthValue(),
+                        today.getYear()
+                );
+
+        if(existingBudget != null){
+
+            existingBudget.setMonthlyBudget(
+                    budget.getMonthlyBudget()
+            );
+
+            budgetRepo.save(existingBudget);
+
+        }else{
+
+            budget.setUser(user);
+
+            budget.setMonth(today.getMonthValue());
+
+            budget.setYear(today.getYear());
+
+            budgetRepo.save(budget);
+
+        }
+
+        return "redirect:/expenses";
+    }
     @GetMapping("/add-expense")
     public String showForm(Model model) {
 
@@ -220,25 +268,65 @@ public class ExpenseController {
 
         User user = userRepo.findByUsername(username);
 
-        // Get expenses of logged-in user
         List<Expense> expenses = repo.findByUser(user);
 
-        // Calculate total expense
         double totalExpense = expenses.stream()
                 .mapToDouble(Expense::getAmount)
                 .sum();
 
-        // Calculate current month expense
+        LocalDate today = LocalDate.now();
+
         double monthlyExpense = expenses.stream()
-                .filter(expense -> expense.getDate() != null &&
-                        expense.getDate().getMonthValue() ==
-                                java.time.LocalDate.now().getMonthValue())
+                .filter(expense -> expense.getDate() != null
+                        && expense.getDate().getMonthValue() == today.getMonthValue()
+                        && expense.getDate().getYear() == today.getYear())
                 .mapToDouble(Expense::getAmount)
                 .sum();
+
+        // Fetch current month's budget
+        Budget budget = budgetRepo.findByUserAndMonthAndYear(
+                user,
+                today.getMonthValue(),
+                today.getYear()
+        );
+
+        double monthlyBudget = 0;
+        double remainingBudget = 0;
+        double budgetUsed = 0;
+        String warning = "No budget set for this month.";
+
+        if (budget != null) {
+
+            monthlyBudget = budget.getMonthlyBudget();
+
+            remainingBudget = monthlyBudget - monthlyExpense;
+
+            if (monthlyBudget > 0) {
+                budgetUsed = (monthlyExpense / monthlyBudget) * 100;
+            }
+
+            if (budgetUsed >= 100) {
+
+                warning = "🚨 Budget Exceeded!";
+
+            } else if (budgetUsed >= 80) {
+
+                warning = "⚠️ You have used over 80% of your budget.";
+
+            } else {
+
+                warning = "✅ Budget is under control.";
+            }
+        }
 
         model.addAttribute("expenses", expenses);
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("monthlyExpense", monthlyExpense);
+
+        model.addAttribute("monthlyBudget", monthlyBudget);
+        model.addAttribute("remainingBudget", remainingBudget);
+        model.addAttribute("budgetUsed", budgetUsed);
+        model.addAttribute("warning", warning);
 
         return "expenses";
     }
